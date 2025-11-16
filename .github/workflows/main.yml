@@ -1,0 +1,33 @@
+name: Pipeline CI/CD para Landing Page
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ⬇️ Checkout do Repositório
+        uses: actions/checkout@v4
+        
+
+      - name: 🛠️ Setup Node.js (necessário para o linter)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      
+      - name: 🧪 Instalar e Rodar HTML Linter (HTMLHint)
+        run: |
+          npm install -g htmlhint
+          htmlhint index.html
+
+      - name: 🚀 Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: success() 
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
