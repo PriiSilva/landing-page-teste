@@ -4,7 +4,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -12,22 +11,40 @@ jobs:
     steps:
       - name: ⬇️ Checkout do Repositório
         uses: actions/checkout@v4
-        
-
+        with:
+          fetch-depth: 0 
+          
       - name: 🛠️ Setup Node.js (necessário para o linter)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      
       - name: 🧪 Instalar e Rodar HTML Linter (HTMLHint)
         run: |
           npm install -g htmlhint
           htmlhint index.html
 
+      # SAST (Static Analysis): Pronta para JS se você adicionar no futuro
+      - name: ⚙️ Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: 🔎 Rodar CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
       - name: 🚀 Deploy para GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: success() 
+        id: deploy
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
+
+      # DAST (Dynamic Analysis): Essencial para validar headers de segurança do ambiente
+      - name: 🕷️ Rodar ZAP Baseline Scan (DAST)
+        uses: zaproxy/action-baseline@v0.12.0 
+        with:
+          target: 'https://seu-usuario.github.io/seu-repositorio/' # NÃO ESQUEÇA DE MUDAR
+          fail_action: false
+          allow_external_rules: true
