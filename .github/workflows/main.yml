@@ -24,14 +24,13 @@ jobs:
           npm install -g htmlhint
           htmlhint index.html
 
-      # SAST (Static Analysis): Pronta para JS se você adicionar no futuro
       - name: ⚙️ Inicializar CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4 
         with:
-          languages: javascript
+          languages: html, javascript
 
       - name: 🔎 Rodar CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
 
       - name: 🚀 Deploy para GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -41,10 +40,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
 
-      # DAST (Dynamic Analysis): Essencial para validar headers de segurança do ambiente
       - name: 🕷️ Rodar ZAP Baseline Scan (DAST)
         uses: zaproxy/action-baseline@v0.12.0 
         with:
-          target: 'https://seu-usuario.github.io/seu-repositorio/' # NÃO ESQUEÇA DE MUDAR
+          target: 'https://priisilva.github.io/landing-page-teste/' 
           fail_action: false
           allow_external_rules: true
